@@ -44,7 +44,7 @@ public class MessageTraceToolHandler implements ToolHandler {
 
     @Override
     public Object execute(Map<String, Object> input) {
-        String instanceId = (String) input.get("cluster");
+        String instanceId = (String) input.get("instance");
         String msgId = (String) input.get("msgId");
         String topic = (String) input.get("topic");
         TraceRecordVO trace = messageService.getMessageTrace(instanceId, msgId, topic);

@@ -32,6 +32,7 @@ import org.apache.rocketmq.studio.common.exception.BusinessException;
 import org.apache.rocketmq.studio.common.domain.PageResult;
 import org.apache.rocketmq.studio.instance.group.ConsumerGroupVO;
 import org.apache.rocketmq.studio.instance.message.MessageService;
+import org.apache.rocketmq.studio.instance.message.TraceRecordVO;
 import org.apache.rocketmq.studio.instance.topic.MetadataService;
 import org.apache.rocketmq.studio.instance.topic.TopicVO;
 import org.apache.rocketmq.studio.ops.ai.AiToolVO;
@@ -616,10 +617,34 @@ class ToolGatewayServiceTest {
         AuthenticatedUserContext.setUser(2L, "reader", false);
 
         assertThatThrownBy(() -> gateway.execute(
-                "rmq.message.query", Map.of("cluster", "cluster-v5")))
+                "rmq.message.query", Map.of("instance", "cluster-v5")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("Admin permission required");
         verifyNoInteractions(messageService);
+    }
+
+    @Test
+    void messageQueryToolTargetsTheInstanceNamedByItsInput() {
+        when(messageService.queryMessages(
+                "inst-1", "TopicA", null, null, null, null, null)).thenReturn(List.of());
+
+        gateway.execute(
+                "rmq.message.query", Map.of("instance", "inst-1", "topic", "TopicA"));
+
+        verify(messageService).queryMessages("inst-1", "TopicA", null, null, null, null, null);
+    }
+
+    @Test
+    void messageTraceToolTargetsTheInstanceNamedByItsInput() {
+        when(messageService.getMessageTrace("inst-1", "msg-1", null))
+                .thenReturn(TraceRecordVO.builder()
+                        .nodes(List.of())
+                        .consumerStatus(List.of())
+                        .build());
+
+        gateway.execute("rmq.message.trace", Map.of("instance", "inst-1", "msgId", "msg-1"));
+
+        verify(messageService).getMessageTrace("inst-1", "msg-1", null);
     }
 
     @Test

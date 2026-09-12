@@ -86,6 +86,22 @@ class ToolCatalogTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void messageToolInputsAreInstanceAddressed() {
+        for (String name : List.of("rmq.message.query", "rmq.message.trace")) {
+            ToolDefinition tool = ToolCatalog.load(canonicalCatalog(), canonicalSchema())
+                    .find(name)
+                    .orElseThrow();
+            List<String> required = (List<String>) tool.inputSchema().get("required");
+            assertThat(required).contains("instance").doesNotContain("cluster");
+            Map<String, Object> properties =
+                    (Map<String, Object>) tool.inputSchema().get("properties");
+            Map<String, Object> instance = (Map<String, Object>) properties.get("instance");
+            assertThat((String) instance.get("description")).contains("instance");
+        }
+    }
+
+    @Test
     void rejectsIncompatibleMinimumClientMajorVersion() {
         Resource incompatible = utf8Resource("""
                 version: 2.0.0

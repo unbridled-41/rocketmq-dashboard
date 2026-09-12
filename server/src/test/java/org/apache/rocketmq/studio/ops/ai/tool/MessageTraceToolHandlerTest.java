@@ -65,7 +65,7 @@ class MessageTraceToolHandlerTest {
                 .thenReturn(trace);
 
         Object result = handler.execute(Map.of(
-                "cluster", "instance-a", "msgId", "msg-1", "topic", "TopicA"));
+                "instance", "instance-a", "msgId", "msg-1", "topic", "TopicA"));
 
         assertThat(result).isInstanceOf(Map.class);
         Map<?, ?> row = (Map<?, ?>) result;

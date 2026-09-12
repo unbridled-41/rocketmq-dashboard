@@ -60,7 +60,7 @@ class MessageQueryToolHandlerTest {
         when(messageService.queryMessages(eq("instance-a"), eq("TopicA"), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(message));
 
-        Object result = handler.execute(Map.of("cluster", "instance-a", "topic", "TopicA"));
+        Object result = handler.execute(Map.of("instance", "instance-a", "topic", "TopicA"));
 
         assertThat(result).isInstanceOf(List.class);
         List<?> rows = (List<?>) result;
@@ -79,7 +79,7 @@ class MessageQueryToolHandlerTest {
         when(messageService.queryMessages(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of());
 
-        handler.execute(Map.of("cluster", "instance-a", "topic", "TopicA",
+        handler.execute(Map.of("instance", "instance-a", "topic", "TopicA",
                 "startTime", 1000L, "endTime", 2000L));
 
         verify(messageService)
@@ -93,7 +93,7 @@ class MessageQueryToolHandlerTest {
 
         org.assertj.core.api.Assertions.assertThatThrownBy(
                         () -> handler.execute(Map.of(
-                                "cluster", "instance-a", "topic", "TopicA", "startTime", overflow)))
+                                "instance", "instance-a", "topic", "TopicA", "startTime", overflow)))
                 .isInstanceOf(org.apache.rocketmq.studio.common.exception.BusinessException.class)
                 .hasMessageContaining("epoch-milliseconds");
     }
@@ -102,7 +102,7 @@ class MessageQueryToolHandlerTest {
     void executeShouldRejectNonFiniteTimestampInsteadOfWrapping() {
         org.assertj.core.api.Assertions.assertThatThrownBy(
                         () -> handler.execute(Map.of(
-                                "cluster", "instance-a", "topic", "TopicA",
+                                "instance", "instance-a", "topic", "TopicA",
                                 "startTime", Double.POSITIVE_INFINITY)))
                 .isInstanceOf(org.apache.rocketmq.studio.common.exception.BusinessException.class)
                 .hasMessageContaining("epoch-milliseconds");
@@ -112,7 +112,7 @@ class MessageQueryToolHandlerTest {
     void executeShouldRejectNonNumericTimestamp() {
         org.assertj.core.api.Assertions.assertThatThrownBy(
                         () -> handler.execute(Map.of(
-                                "cluster", "instance-a", "topic", "TopicA",
+                                "instance", "instance-a", "topic", "TopicA",
                                 "startTime", "not-a-number")))
                 .isInstanceOf(org.apache.rocketmq.studio.common.exception.BusinessException.class)
                 .hasMessageContaining("epoch-milliseconds");
@@ -123,7 +123,7 @@ class MessageQueryToolHandlerTest {
         when(messageService.queryMessages(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of());
 
-        handler.execute(Map.of("cluster", "instance-a", "topic", "TopicA",
+        handler.execute(Map.of("instance", "instance-a", "topic", "TopicA",
                 "startTime", java.math.BigInteger.valueOf(123456789L)));
 
         verify(messageService)

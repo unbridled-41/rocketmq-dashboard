@@ -45,7 +45,7 @@ public class MessageQueryToolHandler implements ToolHandler {
 
     @Override
     public Object execute(Map<String, Object> input) {
-        String instanceId = (String) input.get("cluster");
+        String instanceId = (String) input.get("instance");
         String topic = (String) input.get("topic");
         String msgId = (String) input.get("msgId");
         String tag = (String) input.get("tag");

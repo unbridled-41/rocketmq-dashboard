@@ -78,7 +78,7 @@ public class ToolGatewayService {
 
         return catalog.list().stream()
                 .filter(definition -> discoveryCapabilities.clusterCapabilitiesResolved()
-                        || !requiresCluster(definition))
+                        || !requiresTargetContext(definition))
                 .filter(definition -> discoveryCapabilities.capabilities().containsAll(
                         definition.requiredCapabilities()))
                 .filter(this::isVisibleToCurrentUser)
@@ -220,9 +220,16 @@ public class ToolGatewayService {
         return Collections.unmodifiableMap(compiled);
     }
 
-    private static boolean requiresCluster(ToolDefinition definition) {
+    /**
+     * Whether the tool is addressed through a target entity declared in its required input
+     * fields: metadata tools through {@code cluster}, runtime tools (message query/trace)
+     * through {@code instance}. Such tools are only discoverable once that target's context
+     * resolves.
+     */
+    private static boolean requiresTargetContext(ToolDefinition definition) {
         Object required = definition.inputSchema().get("required");
-        return required instanceof List<?> fields && fields.contains("cluster");
+        return required instanceof List<?> fields
+                && (fields.contains("cluster") || fields.contains("instance"));
     }
 
     private boolean isVisibleToCurrentUser(ToolDefinition definition) {

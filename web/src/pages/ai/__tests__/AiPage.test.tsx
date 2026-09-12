@@ -456,6 +456,32 @@ describe('AiPage tool runner', () => {
     expect(within(dialog).getByTestId('tool-result')).toHaveTextContent('"GRPC"');
   });
 
+  it('does not prefill the selected cluster id into instance-addressed tools', async () => {
+    vi.mocked(listTools).mockResolvedValue([
+      {
+        name: 'rmq.message.query',
+        description: 'Query messages in a RocketMQ instance.',
+        parameters: {
+          type: 'object',
+          required: ['instance'],
+          properties: { instance: { type: 'string' }, topic: { type: 'string' } },
+        },
+        riskLevel: 'L1',
+        permission: 'message:read',
+      },
+    ]);
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: '工具' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'AI 工具' });
+    await waitFor(() => expect(listTools).toHaveBeenCalledWith('cluster-a'));
+
+    const input = within(dialog).getByRole('textbox', { name: '工具参数 JSON' });
+    expect(input).toHaveValue('{\n  "instance": ""\n}');
+  });
+
   it('ignores an older tool catalog after the cluster changes', async () => {
     const oldTools = [{ name: 'rmq.old', description: 'old', parameters: {} }];
     const latestTools = [{ name: 'rmq.latest', description: 'latest', parameters: {} }];

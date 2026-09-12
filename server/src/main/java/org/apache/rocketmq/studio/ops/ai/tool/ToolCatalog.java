@@ -139,8 +139,12 @@ public class ToolCatalog {
         if (CLUSTER_LIST_TOOL.equals(definition.name())) {
             return;
         }
+        // Every remote tool must declare the entity it is addressed by: metadata tools are
+        // cluster-addressed, runtime tools (message query/trace) are instance-addressed.
         Object required = definition.inputSchema().get("required");
-        if (!(required instanceof List<?> requiredFields) || !requiredFields.contains("cluster")) {
+        boolean declaresTargetField = required instanceof List<?> requiredFields
+                && (requiredFields.contains("cluster") || requiredFields.contains("instance"));
+        if (!declaresTargetField) {
             throw new IllegalStateException(
                     "Remote tool must require cluster: " + definition.name());
         }

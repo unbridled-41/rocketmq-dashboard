@@ -358,12 +358,13 @@ tools:
     inputSchema:
       type: object
       required:
-        - cluster
+        - instance
       additionalProperties: false
       properties:
-        cluster:
+        instance:
           type: string
           minLength: 1
+          description: The RocketMQ instance identifier (unique name or numeric id) that the query targets.
         topic:
           type: string
         msgId:
@@ -420,13 +421,14 @@ tools:
     inputSchema:
       type: object
       required:
-        - cluster
+        - instance
         - msgId
       additionalProperties: false
       properties:
-        cluster:
+        instance:
           type: string
           minLength: 1
+          description: The RocketMQ instance identifier (unique name or numeric id) that owns the traced message.
         msgId:
           type: string
           minLength: 1
