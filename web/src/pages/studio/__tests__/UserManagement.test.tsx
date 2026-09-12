@@ -246,4 +246,22 @@ describe('UserManagementPage', () => {
     expect(setStudioUserEnabled).toHaveBeenCalledWith(7, false);
     await act(async () => resolveUpdate());
   });
+
+  it('clears the create-user form after the dialog is dismissed', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: '新建用户' }));
+    await user.type(await screen.findByLabelText('用户名'), 'temp-operator');
+    await user.type(screen.getByLabelText('初始密码'), 'initial-pass-123');
+    await user.click(screen.getByLabelText('管理员权限'));
+    expect(screen.getByLabelText('管理员权限')).toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(await screen.findByRole('button', { name: '新建用户' }));
+
+    expect(await screen.findByLabelText('用户名')).toHaveValue('');
+    expect(screen.getByLabelText('初始密码')).toHaveValue('');
+    expect(screen.getByLabelText('管理员权限')).not.toBeChecked();
+  });
 });

@@ -510,7 +510,10 @@ const UserManagementPage = () => {
         title="新建 Studio 用户"
         open={createOpen}
         onOk={() => void createUser()}
-        onCancel={() => setCreateOpen(false)}
+        onCancel={() => {
+          setCreateOpen(false);
+          createForm.resetFields();
+        }}
       >
         <Form form={createForm} layout="vertical" initialValues={{ admin: false }}>
           <Form.Item name="username" label="用户名" rules={[{ required: true }, { max: 128 }]}>
